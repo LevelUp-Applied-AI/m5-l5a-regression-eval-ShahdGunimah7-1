@@ -9,6 +9,7 @@ Run: python lab_regression.py
 
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold
 from sklearn.linear_model import LogisticRegression, Ridge, Lasso
 from sklearn.preprocessing import StandardScaler
@@ -32,15 +33,18 @@ def load_data(filepath="data/telecom_churn.csv"):
     Returns:
         DataFrame with all columns.
     """
-    try:
-        df = pd.read_csv(filepath)
-        return df
-    except FileNotFoundError:
-        print(f"Error: Could not find file at '{filepath}'")
-        return None
-    except Exception as e:
-        print(f"Error loading data: {e}")
-        return None
+    candidate_paths = [
+        Path(filepath),
+        Path("data/telecom_churn.csv"),
+        Path("starter/data/telecom_churn.csv"),
+    ]
+
+    for path in candidate_paths:
+        if path.exists():
+            return pd.read_csv(path)
+
+    print(f"Error: Could not find file at '{filepath}'")
+    return None
 
 
 def split_data(df, target_col, test_size=0.2, random_state=42):
@@ -59,7 +63,6 @@ def split_data(df, target_col, test_size=0.2, random_state=42):
         X = df.drop(columns=[target_col])
         y = df[target_col]
 
-        # Use stratify only for classification target
         stratify_arg = y if target_col == "churned" else None
 
         X_train, X_test, y_train, y_test = train_test_split(
@@ -140,8 +143,7 @@ def evaluate_classifier(pipeline, X_train, X_test, y_train, y_test):
         print("Confusion Matrix:")
         print(confusion_matrix(y_test, y_pred))
 
-        # Display confusion matrix
-        ConfusionMatrixDisplay.from_predictions(y_test, y_pred)
+        # ConfusionMatrixDisplay.from_predictions(y_test, y_pred)
 
         metrics = {
             "accuracy": accuracy_score(y_test, y_pred),
@@ -318,17 +320,16 @@ if __name__ == "__main__":
             except Exception as e:
                 print(f"Error comparing Ridge and Lasso coefficients: {e}")
 
-        # Task 7: Summary of findings
     """
-       Summary of findings:
+    Summary of findings:
 
-       From the results, it looks like some features such as monthly_charges and 
-       num_support_calls have a stronger impact on predicting churn compared to others.
+    From the results, it looks like some features such as monthly_charges and
+    num_support_calls have a stronger impact on predicting churn compared to others.
 
-       The logistic regression model performs reasonably well, but since the dataset 
-       is imbalanced, accuracy alone is not very reliable. Recall is more important 
-       in this case because it helps us identify more customers who are likely to churn.
+    The logistic regression model performs reasonably well, but since the dataset
+    is imbalanced, accuracy alone is not very reliable. Recall is more important
+    in this case because it helps us identify more customers who are likely to churn.
 
-       To improve performance, we could try tuning the model parameters, adding new 
-       features, or using more advanced models like Random Forest or Gradient Boosting.
+    To improve performance, we could try tuning the model parameters, adding new
+    features, or using more advanced models like Random Forest or Gradient Boosting.
     """
