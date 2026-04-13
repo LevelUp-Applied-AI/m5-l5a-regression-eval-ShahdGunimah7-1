@@ -8,6 +8,7 @@ Run: python lab_regression.py
 """
 
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold
 from sklearn.linear_model import LogisticRegression, Ridge, Lasso
 from sklearn.preprocessing import StandardScaler
@@ -331,4 +332,3 @@ if __name__ == "__main__":
        To improve performance, we could try tuning the model parameters, adding new 
        features, or using more advanced models like Random Forest or Gradient Boosting.
     """
-    
